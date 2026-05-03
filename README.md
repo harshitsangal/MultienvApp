@@ -1,41 +1,82 @@
 # MultiEnv Ticket Management System
 
-A full-stack application using Flask for both frontend and backend services, demonstrating environment-specific ticket management.
+A full-stack application with a React frontend and separate Flask backends for development and production, demonstrating environment-specific ticket management.
+
+## Quick start
+
+### Prerequisites
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (or Docker Engine with Compose v2) installed and **running**
+- **Port 3000** free on your machine (the web UI is published there)
+
+### Start the stack
+
+From the repository root (`MultienvApp`):
+
+```bash
+docker compose up --build
+```
+
+The first run downloads images and builds the frontend; it may take several minutes. When the logs settle, the app is ready.
+
+### URLs
+
+| Page or API | URL |
+|-------------|-----|
+| Home | http://localhost:3000/ |
+| Dev environment (UI) | http://localhost:3000/dev |
+| Prod environment (UI) | http://localhost:3000/prod |
+| Dev tickets (JSON API) | http://localhost:3000/dev/api/tickets |
+| Prod tickets (JSON API) | http://localhost:3000/prod/api/tickets |
+
+The React app talks to the Flask backends through **nginx** on the same origin (`/dev/api/...` and `/prod/api/...`). MongoDB runs in Compose and is wired via `MONGO_URI` in `docker-compose.yml`; **27017** is also published if you want a local Mongo client.
+
+### Stop
+
+Press `Ctrl+C` in the terminal where Compose is running, or run:
+
+```bash
+docker compose down
+```
+
+To remove the database volume as well: `docker compose down -v`.
 
 ## Project Structure
 
 ```
-multienv/
+MultienvApp/
 ├── docker-compose.yml
 ├── backend/
 │   ├── dev/
 │   │   ├── app.py
 │   │   ├── requirements.txt
 │   │   ├── Dockerfile
-│   │   └── .env
+│   │   └── .env          # optional; not required when using Compose defaults
 │   └── prod/
 │       ├── app.py
 │       ├── requirements.txt
 │       ├── Dockerfile
 │       └── .env
 └── frontend/
-    ├── app.py
-    ├── requirements.txt
+    ├── src/
+    ├── package.json
     ├── Dockerfile
-    └── .env
+    └── nginx.conf
 ```
 
 ## Environment Configuration
 
-### Backend Development Environment (.env)
+With **Docker Compose**, `MONGO_URI` is set in `docker-compose.yml` (separate MongoDB databases for dev and prod). You only need `.env` files under `backend/dev` or `backend/prod` if you run Flask outside Compose or override the connection string.
+
+### Backend Development Environment (.env) — optional
+
 ```
-PORT=3001
 MONGO_URI=your_dev_mongodb_uri
 ```
 
-### Backend Production Environment (.env)
+### Backend Production Environment (.env) — optional
+
 ```
-PORT=3002
 MONGO_URI=your_prod_mongodb_uri
 ```
 
@@ -49,19 +90,6 @@ python-dotenv==0.19.0
 pymongo==3.12.0
 requests==2.26.0
 ```
-
-
-
-### Using Docker Compose
-```bash
-docker-compose up
-```
-
-## Accessing the Application
-
-- Frontend: http://localhost:3000/
-- Development Environment: http://localhost:3001/dev
-- Production Environment: http://localhost:3002/prod
 
 
 
