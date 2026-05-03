@@ -101,3 +101,15 @@ requests==2.26.0
 - Use secure headers
 
 
+## Screenshots
+
+<img width="959" height="269" alt="image" src="https://github.com/user-attachments/assets/41b30d7f-dda6-49b4-a419-76c5288ba254" />
+
+
+<img width="947" height="268" alt="image" src="https://github.com/user-attachments/assets/3e67c857-b338-4043-8873-b7bac03dd64d" />
+
+
+<img width="949" height="239" alt="image" src="https://github.com/user-attachments/assets/33bc8d75-0295-4972-bec8-4f8a72f69740" />
+
+
+<img width="948" height="367" alt="image" src="https://github.com/user-attachments/assets/d04f364c-3104-47b3-a1fc-3ba0ed96f2dc" />
