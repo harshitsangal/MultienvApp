@@ -51,16 +51,42 @@ def delete(id):
     mongo.db.todos.delete_one({'_id': ObjectId(id)})
     return redirect(url_for('index'))
 
-@app.route('/api/tickets', methods=['GET'])
-def get_tickets():
-    """Fetch development environment tickets"""
-    todos = list(mongo.db.todos.find({}, {"_id": 0, "title": 1, "description": 1, "completed": 1, "created_at": 1}))
-    
-    for todo in todos:
-       
-        todo["created_at"] = todo["created_at"].isoformat() if "created_at" in todo else None
-    
-    return jsonify({"tasks": todos, "environment": "Development"})
+@app.route('/api/tickets', methods=['GET', 'POST'])
+def tickets_api():
+    """List or create development environment tickets (JSON API)."""
+    if request.method == 'GET':
+        todos = list(
+            mongo.db.todos.find(
+                {}, {"_id": 0, "title": 1, "description": 1, "completed": 1, "created_at": 1}
+            )
+        )
+        for todo in todos:
+            todo["created_at"] = (
+                todo["created_at"].isoformat() if "created_at" in todo else None
+            )
+        return jsonify({"tasks": todos, "environment": "Development"})
+
+    data = request.get_json(silent=True) or {}
+    title = (data.get("title") or "").strip()
+    description = (data.get("description") or "").strip() or None
+    if not title:
+        return jsonify({"error": "title is required"}), 400
+
+    doc = {
+        "title": title,
+        "description": description,
+        "completed": False,
+        "created_at": datetime.utcnow(),
+    }
+    result = mongo.db.todos.insert_one(doc)
+    created = mongo.db.todos.find_one(
+        {"_id": result.inserted_id},
+        {"_id": 0, "title": 1, "description": 1, "completed": 1, "created_at": 1},
+    )
+    created["created_at"] = (
+        created["created_at"].isoformat() if created.get("created_at") else None
+    )
+    return jsonify({"task": created, "environment": "Development"}), 201
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=3001 , debug=True)
