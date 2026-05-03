@@ -1,0 +1,38 @@
+services:
+
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  backend-dev:
+    build:
+      context: ./backend/dev
+    environment:
+      - ENV=development
+      - MONGO_URI=mongodb://mongo:27017/dev_todos
+    depends_on:
+      - mongo
+
+  backend-prod:
+    build:
+      context: ./backend/prod
+    environment:
+      - ENV=production
+      - MONGO_URI=mongodb://mongo:27017/prod_todos
+    depends_on:
+      - mongo
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend-dev
+      - backend-prod
+
+volumes:
+  mongo_data:
